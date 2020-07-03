@@ -15,9 +15,9 @@ namespace Blog.Controllers
             _fileManager = fileManager;
         }
 
-        public IActionResult Index() // el nombre de la accion corresponde al archivo index.cshtml en la carpeta Home por Homecontroller
+        public IActionResult Index(string category) // el nombre de la accion corresponde al archivo index.cshtml en la carpeta Home por Homecontroller
         {
-            var posts = _repo.GetAllPosts();
+            var posts = string.IsNullOrEmpty(category) ? _repo.GetAllPosts(): _repo.GetAllPosts(category);
             return View(posts);
         }
 
