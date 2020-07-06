@@ -4,6 +4,7 @@ using Blog.Data.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -44,7 +45,11 @@ namespace Blog
             services.AddTransient<IRepository, Repository>(); //Repository available for everyone
             services.AddTransient<IFileManager, FileManager>();
 
-            services.AddMvc(option => option.EnableEndpointRouting = false );       
+            services.AddMvc(option =>
+            {
+                option.EnableEndpointRouting = false;
+                option.CacheProfiles.Add("Monthly", new CacheProfile { Duration = 60 * 60 * 24 * 7 * 4});
+            });       
         }
         
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,8 +57,10 @@ namespace Blog
         {
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                //app.UseDeveloperExceptionPage();
             }
+
+            app.UseDeveloperExceptionPage();
 
             app.UseStaticFiles();
 

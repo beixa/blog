@@ -15,19 +15,13 @@ namespace Blog.Controllers
             _fileManager = fileManager;
         }
 
-        public IActionResult Index(string category) // el nombre de la accion corresponde al archivo index.cshtml en la carpeta Home por Homecontroller
-        {
-            var posts = string.IsNullOrEmpty(category) ? _repo.GetAllPosts(): _repo.GetAllPosts(category);
-            return View(posts);
-        }
+        // el nombre de la accion corresponde al archivo index.cshtml en la carpeta Home por Homecontroller
+        public IActionResult Index(string category) => View(string.IsNullOrEmpty(category) ? _repo.GetAllPosts() : _repo.GetAllPosts(category)); 
 
-        public IActionResult Post(int id)
-        {
-            var post = _repo.GetPost(id);
-            return View(post);
-        }
+        public IActionResult Post (int id) => View(_repo.GetPost(id));        
 
         [HttpGet("/Image/{image}")] //its gonna look for this path
+        [ResponseCache(CacheProfileName="Monthly")]
         public IActionResult Image(string image)
         {
             var mime = image.Split('.')[1];
