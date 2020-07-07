@@ -21,7 +21,15 @@ namespace Blog.Controllers
         }
 
         // el nombre de la accion corresponde al archivo index.cshtml en la carpeta Home por Homecontroller
-        public IActionResult Index(string category) => View(string.IsNullOrEmpty(category) ? _repo.GetAllPosts() : _repo.GetAllPosts(category)); 
+        public IActionResult Index(int pageNumber, string category)
+        {
+            if (pageNumber < 1)
+                return RedirectToAction("Index", new { pageNumber = 1, category});
+
+            var viewModel = _repo.GetAllPosts(pageNumber, category);
+
+            return View(viewModel);
+        }
 
         public IActionResult Post (int id) => View(_repo.GetPost(id));        
 
