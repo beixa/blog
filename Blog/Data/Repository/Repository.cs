@@ -1,4 +1,6 @@
 ﻿using Blog.Models;
+using Blog.Models.Comments;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +33,10 @@ namespace Blog.Data.Repository
 
         public Post GetPost(int id)
         {
-            return _context.Posts.FirstOrDefault(p => p.Id == id);
+            return _context.Posts
+                .Include(p => p.MainComments)
+                    .ThenInclude(mc => mc.SubComments)
+                .FirstOrDefault(p => p.Id == id);
         }
 
         public void RemovePost(int id)
@@ -52,6 +57,10 @@ namespace Blog.Data.Repository
             }
             return false;
         }
-       
+
+        public void AddSubComment(SubComment comment)
+        {
+            _context.SubComments.Add(comment);
+        }
     }
 }

@@ -1,6 +1,11 @@
 ﻿using Blog.Data.FileManager;
 using Blog.Data.Repository;
+using Blog.Models.Comments;
+using Blog.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Blog.Controllers
 {
@@ -26,6 +31,42 @@ namespace Blog.Controllers
         {
             var mime = image.Split('.')[1];
             return new FileStreamResult(_fileManager.ImageStream(image), $"image/{mime}");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Comment ( CommentViewModel viewModel)
+        {
+            if(!ModelState.IsValid)
+                return RedirectToAction("Post", new { id = viewModel.PostId });
+
+            var post = _repo.GetPost(viewModel.PostId);
+
+            if (viewModel.MainCommentId == 0)
+            {
+                post.MainComments = post.MainComments ?? new List<MainComment>();
+
+                post.MainComments.Add(new MainComment
+                {
+                    Message = viewModel.Message,
+                    Created = DateTime.Now,
+                });
+
+                _repo.UpdatePost(post);
+            }
+            else
+            {
+                var comment = new SubComment
+                {
+                    MainCommentId = viewModel.MainCommentId,
+                    Message = viewModel.Message,
+                    Created = DateTime.Now, 
+                };
+                _repo.AddSubComment(comment);
+            }
+
+            await _repo.SaveChangesAsync();
+
+            return RedirectToAction("Post", new { id = viewModel.PostId });
         }
     }
 }
