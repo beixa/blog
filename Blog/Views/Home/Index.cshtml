@@ -12,23 +12,15 @@
 </div>
 <div class="container">
     @foreach (var post in Model.Posts)
-    {        
+    {
         var image_path = $"{base_path}/Image/{post.Image}";
         <a class="post" asp-controller="Home" asp-action="Post" asp-route-id="@post.Id">
-            <img src="@image_path"/>
+            <img src="@image_path" />
             <span class="title">
                 @post.Title
             </span>
         </a>
     }
-<div>
-    @if (Model.PageNumber > 1)
-    {
-        <a asp-action="Index" asp-controller="Home" asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-category="@(Model.Category)">Previous page</a>
-    }
-    @if (Model.NextPage)
-    {
-        <a asp-action="Index" asp-controller="Home" asp-route-pageNumber="@(Model.PageNumber + 1)" asp-route-category="@(Model.Category)">Next page</a>
-    }
-</div>
+
+<partial name="_BlogPagination" model="Model"/>
 </div>
