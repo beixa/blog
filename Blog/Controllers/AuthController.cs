@@ -1,10 +1,6 @@
 ﻿using Blog.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Blog.Controllers
@@ -12,10 +8,12 @@ namespace Blog.Controllers
     public class AuthController : Controller
     {
         private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public AuthController(SignInManager<IdentityUser> signInManager)
+        public AuthController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
         {
             _signInManager = signInManager;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -29,7 +27,50 @@ namespace Blog.Controllers
         {
             var result = await _signInManager.PasswordSignInAsync(viewModel.UserName, viewModel.Password, false, false);
 
-            return RedirectToAction("Index", "Panel");
+            if (!result.Succeeded)
+            {
+                return View(viewModel);
+            }               
+
+            var user = await _userManager.FindByNameAsync(viewModel.UserName);
+            var isAdmin = await _userManager.IsInRoleAsync(user,"Admin");
+
+            if (isAdmin)
+            {
+                return RedirectToAction("Index", "Panel");
+            } 
+            
+            return RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet]
+        public IActionResult Register() //this will display the page
+        {
+            return View(new RegisterViewModel());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterViewModel viewModel)
+        {
+            if(!ModelState.IsValid) //checks if are validated with atriibutes defined in the model
+            {
+                return View(viewModel);
+            }
+
+            var user = new IdentityUser
+            {
+                UserName = viewModel.Email,
+                Email = viewModel.Email,
+            };
+            var result = await _userManager.CreateAsync(user, viewModel.Password);
+
+            if(result.Succeeded)
+            {
+                await _signInManager.SignInAsync(user, false);
+                return RedirectToAction("Index","Home");
+            }
+
+            return View(viewModel);
         }
 
         [HttpGet]

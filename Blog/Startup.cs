@@ -66,7 +66,7 @@ namespace Blog
 
             app.UseAuthentication();
 
-            app.UseMvcWithDefaultRoute();
+            app.UseMvcWithDefaultRoute();//this will search for controller="Home"/action="Index"
             
         }
     }
