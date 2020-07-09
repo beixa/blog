@@ -1,6 +1,8 @@
+using Blog.Configuration;
 using Blog.Data;
 using Blog.Data.FileManager;
 using Blog.Data.Repository;
+using Blog.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -25,6 +27,8 @@ namespace Blog
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<SmtpSettings>(_config.GetSection("SmtpSettings"));
+
             services.AddDbContext<AppDbContext>(options => options.UseSqlServer(_config["DefaultConnection"]));
 
             services.AddIdentity<IdentityUser, IdentityRole>(options => 
@@ -44,6 +48,7 @@ namespace Blog
 
             services.AddTransient<IRepository, Repository>(); //Repository available for everyone
             services.AddTransient<IFileManager, FileManager>();
+            services.AddSingleton<IEmailService, EmailService>();
 
             services.AddMvc(option =>
             {

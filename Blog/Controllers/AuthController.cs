@@ -1,4 +1,5 @@
-﻿using Blog.ViewModels;
+﻿using Blog.Services;
+using Blog.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -9,11 +10,13 @@ namespace Blog.Controllers
     {
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IEmailService _emailService;
 
-        public AuthController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
+        public AuthController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, IEmailService emailService)
         {
             _signInManager = signInManager;
             _userManager = userManager;
+            _emailService = emailService;
         }
 
         [HttpGet]
@@ -67,6 +70,7 @@ namespace Blog.Controllers
             if(result.Succeeded)
             {
                 await _signInManager.SignInAsync(user, false);
+                await _emailService.SendEmail(user.Email, "Welcome!", "You have signed successfully!"); 
                 return RedirectToAction("Index","Home");
             }
 
