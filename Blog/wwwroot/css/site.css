@@ -31,16 +31,39 @@ nav a {
     background-image: url('../content/static/computer-keyboard-34153.jpg');
     background-position: center;
     background-size: cover;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center
 }
 
-.title {
-    position: absolute;
-    color: white;
-    font-size: 40px;
-    left: 50%;
-    transform: translateX(-50%);
-    top: 35%;
-    text-shadow: 0 0 8px black;
+    .main-img .title {
+        color: white;
+        font-size: 40px;
+        text-shadow: 0 0 8px black;
+        margin-bottom: 1rem;
+    }
+
+.search {
+    color: deepskyblue;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    font-size: 22px;
+    border-bottom: 2px solid deepskyblue;
+} 
+    .search::placeholder {
+        color: deepskyblue;
+    }
+
+.submit-btn {
+        display: none;
+}
+
+@media screen and (max-width: 768px) {
+    .submit-btn {
+        display: inline-block;
+    }
 }
 
 .container {
@@ -55,6 +78,17 @@ nav a {
     display: flex;
     height:400px; 
     box-shadow: 0 0 5px 0 black;
+}
+
+.post .title {
+    position: absolute;
+    color: white;
+    font-size: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 35%;
+    text-shadow: 0 0 8px black;
+    margin-bottom: 1rem;
 }
 
 .post img {

@@ -28,15 +28,22 @@ namespace Blog.Data.Repository
             return _context.Posts.ToList();
         }
 
-        public IndexViewModel GetAllPosts(int pageNumber, string category)
+        public IndexViewModel GetAllPosts(int pageNumber, string category, string search)
         {
             int pageSize = 2;
             int skipAmount = pageSize * (pageNumber - 1);
 
-            var query = _context.Posts.AsQueryable();
+            var query = _context.Posts.AsNoTracking().AsQueryable(); //AsNoTracking() as we don need to keep track of the data to save, update or delete this will allow us to boost performance
 
-            if (!String.IsNullOrEmpty(category))
+            if (!string.IsNullOrEmpty(category))
                 query = query.Where(x => x.Category.ToLower().Equals(category.ToLower()));
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(x => EF.Functions.Like(x.Title, $"%{search}%") || EF.Functions.Like(x.Body, $"%{search}%") || EF.Functions.Like(x.Description, $"%{search}%"));
+                //query = query.Where(x => x.Title.Contains(search) || x.Body.Contains(search) || x.Description.Contains(search));
+                pageNumber = 1;
+            }
 
             var postCount = query.Count();
             var pageCount = (int)Math.Ceiling((double)postCount / pageSize);
@@ -48,6 +55,7 @@ namespace Blog.Data.Repository
                 NextPage = postCount > pageSize * (pageNumber - 1) + pageSize,
                 Pages = PageHelper.PageNumbers(pageNumber, pageCount).ToList(),
                 Category = category,
+                Search = search,
                 Posts = query.Skip(skipAmount).Take(pageSize).ToList(),
             };
         }       
